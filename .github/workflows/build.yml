@@ -3,14 +3,14 @@ name: Build Docker Images
 on:
   push:
     paths:
-      - 'docker-images/**'
-      - 'templates/**'
-      - '.github/workflows/build.yml'
+      - "docker-images/**"
+      - "templates/**"
+      - ".github/workflows/build.yml"
   pull_request:
     paths:
-      - 'docker-images/**'
-      - 'templates/**'
-      - '.github/workflows/build.yml'
+      - "docker-images/**"
+      - "templates/**"
+      - ".github/workflows/build.yml"
   workflow_dispatch:
 
 concurrency:
@@ -49,17 +49,102 @@ jobs:
       manifest: ${{ steps.matrix.outputs.manifest }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
       - id: matrix
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BEFORE_SHA: ${{ github.event.before }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.sha }}
+          REF_NAME: ${{ github.ref_name }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         run: |
-          echo "build=$(jq -c '.build' docker-images/github-actions-matrix.json)" >> "$GITHUB_OUTPUT"
-          echo "manifest=$(jq -c '.manifest' docker-images/github-actions-matrix.json)" >> "$GITHUB_OUTPUT"
+          set -euo pipefail
+
+          full_build=$(jq -c '.build' docker-images/github-actions-matrix.json)
+          full_manifest=$(jq -c '.manifest' docker-images/github-actions-matrix.json)
+
+          emit_all() {
+            echo "Selecting ALL versions"
+            {
+              echo "build=$full_build"
+              echo "manifest=$full_manifest"
+            } >> "$GITHUB_OUTPUT"
+          }
+
+          # Only build versions whose image files changed. Anything we cannot
+          # reliably diff (manual dispatch, new branch, missing base) falls back
+          # to building everything so we never accidentally skip a needed image.
+          case "$EVENT_NAME" in
+            pull_request)
+              base="$BASE_SHA"
+              ;;
+            push)
+              if [ "$REF_NAME" = "$DEFAULT_BRANCH" ]; then
+                base="$BEFORE_SHA"
+              else
+                # Feature branch: compare against the default branch so we build
+                # only what this branch changes relative to it.
+                git fetch --no-tags --quiet origin "$DEFAULT_BRANCH" || true
+                base="$(git merge-base "origin/$DEFAULT_BRANCH" "$HEAD_SHA" 2>/dev/null || true)"
+              fi
+              ;;
+            *)
+              emit_all; exit 0
+              ;;
+          esac
+
+          if [ -z "${base:-}" ] \
+            || [ "$base" = "0000000000000000000000000000000000000000" ] \
+            || ! git cat-file -e "${base}^{commit}" 2>/dev/null; then
+            emit_all; exit 0
+          fi
+
+          changed="$(git diff --name-only "$base" "$HEAD_SHA")"
+          echo "Changed files:"; echo "$changed"
+
+          # A change to the workflow itself or a shared template rebuilds
+          # everything, since those affect every generated image.
+          if echo "$changed" | grep -qE '^\.github/workflows/build\.yml$|^templates/'; then
+            emit_all; exit 0
+          fi
+
+          # Otherwise, restrict the matrix to the changed version directories.
+          versions="$(echo "$changed" \
+            | sed -nE 's#^docker-images/([0-9]+\.[0-9]+)/.*#\1#p' \
+            | sort -u)"
+          echo "Changed versions: ${versions:-<none>}"
+
+          if [ -z "$versions" ]; then
+            {
+              echo "build=[]"
+              echo "manifest=[]"
+            } >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          selected="$(printf '%s\n' $versions | jq -R . | jq -sc .)"
+          filter='[.[] | select(.version as $v | $sel | index($v))]'
+          filtered_build="$(echo "$full_build" | jq -c --argjson sel "$selected" "$filter")"
+          filtered_manifest="$(echo "$full_manifest" | jq -c --argjson sel "$selected" "$filter")"
+          {
+            echo "build=$filtered_build"
+            echo "manifest=$filtered_manifest"
+          } >> "$GITHUB_OUTPUT"
 
   build:
     needs: [lint, generate-matrix]
+    if: needs.generate-matrix.outputs.build != '[]'
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 120
     strategy:
       fail-fast: false
+      # Cap concurrent legs so we don't hammer Docker Hub with dozens of
+      # simultaneous pushes to the same repo (that's what trips its 429
+      # rate limiting, separate from the base-image *pull* limiting we
+      # already moved off Docker Hub for).
+      max-parallel: 6
       matrix:
         include: ${{ fromJson(needs.generate-matrix.outputs.build) }}
     steps:
@@ -76,7 +161,49 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - uses: docker/build-push-action@v7
+      # docker.io intermittently 429s the push side under matrix-wide load
+      # (a separate issue from the base-image *pull* limiting fixed
+      # earlier). docker/build-push-action has no built-in retry (declined
+      # upstream: https://github.com/docker/build-push-action/pull/1422),
+      # so we retry the step itself up to 3 times with backoff. The build
+      # stages are cached via type=gha, so a retry mostly just re-attempts
+      # the push, not a full rebuild.
+      - name: Build and push (attempt 1)
+        id: build_push_1
+        continue-on-error: true
+        uses: docker/build-push-action@v7
+        with:
+          context: docker-images/${{ matrix.version }}/${{ matrix.variant }}
+          platforms: ${{ matrix.platform }}
+          push: ${{ github.event_name == 'push' }}
+          tags: |
+            ${{ env.DOCKER }}:${{ matrix.long_version }}-${{ matrix.variant }}-${{ matrix.arch }}
+            ${{ env.GHCR }}:${{ matrix.long_version }}-${{ matrix.variant }}-${{ matrix.arch }}
+          cache-from: type=gha,scope=${{ matrix.version }}-${{ matrix.variant }}-${{ matrix.arch }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.version }}-${{ matrix.variant }}-${{ matrix.arch }}
+      - name: Wait before retrying push (attempt 2)
+        if: steps.build_push_1.outcome == 'failure'
+        run: sleep 30
+      - name: Build and push (attempt 2)
+        id: build_push_2
+        if: steps.build_push_1.outcome == 'failure'
+        continue-on-error: true
+        uses: docker/build-push-action@v7
+        with:
+          context: docker-images/${{ matrix.version }}/${{ matrix.variant }}
+          platforms: ${{ matrix.platform }}
+          push: ${{ github.event_name == 'push' }}
+          tags: |
+            ${{ env.DOCKER }}:${{ matrix.long_version }}-${{ matrix.variant }}-${{ matrix.arch }}
+            ${{ env.GHCR }}:${{ matrix.long_version }}-${{ matrix.variant }}-${{ matrix.arch }}
+          cache-from: type=gha,scope=${{ matrix.version }}-${{ matrix.variant }}-${{ matrix.arch }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.version }}-${{ matrix.variant }}-${{ matrix.arch }}
+      - name: Wait before retrying push (attempt 3)
+        if: steps.build_push_1.outcome == 'failure' && steps.build_push_2.outcome == 'failure'
+        run: sleep 60
+      - name: Build and push (attempt 3)
+        if: steps.build_push_1.outcome == 'failure' && steps.build_push_2.outcome == 'failure'
+        uses: docker/build-push-action@v7
         with:
           context: docker-images/${{ matrix.version }}/${{ matrix.variant }}
           platforms: ${{ matrix.platform }}
@@ -105,11 +232,15 @@ jobs:
           echo "All codec checks passed"
 
   create-manifests:
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && needs.generate-matrix.outputs.manifest != '[]'
     needs: [build, generate-matrix]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+      # Same reasoning as the build job: avoid a burst of concurrent
+      # `imagetools create` pushes against docker.io tripping its rate
+      # limiting.
+      max-parallel: 6
       matrix:
         include: ${{ fromJson(needs.generate-matrix.outputs.manifest) }}
     steps:
@@ -134,6 +265,23 @@ jobs:
           ISPARENT: ${{ matrix.is_parent }}
           ISLATEST: ${{ matrix.is_latest }}
         run: |
+          # docker.io intermittently 429s these registry writes under load;
+          # retry with backoff instead of failing the whole job on a
+          # transient rate limit.
+          retry() {
+            local max_attempts=5 delay=15 attempt=1
+            until "$@"; do
+              if (( attempt >= max_attempts )); then
+                echo "Command failed after ${attempt} attempts: $*" >&2
+                return 1
+              fi
+              echo "Attempt ${attempt} failed, retrying in ${delay}s: $*" >&2
+              sleep "${delay}"
+              attempt=$((attempt + 1))
+              delay=$((delay * 2))
+            done
+          }
+
           DOCKER_SOURCES=""
           GHCR_SOURCES=""
           IFS=',' read -ra ARCHS <<< "${PLATFORMS}"
@@ -157,10 +305,10 @@ jobs:
           fi
 
           for tag in ${DOCKER_TAGS}; do
-            docker buildx imagetools create -t "${tag}" ${DOCKER_SOURCES}
+            retry docker buildx imagetools create -t "${tag}" ${DOCKER_SOURCES}
           done
           for tag in ${GHCR_TAGS}; do
-            docker buildx imagetools create -t "${tag}" ${GHCR_SOURCES}
+            retry docker buildx imagetools create -t "${tag}" ${GHCR_SOURCES}
           done
 
   build-docs:

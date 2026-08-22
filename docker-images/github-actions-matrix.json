@@ -2,6 +2,136 @@
   "build": [
     {
       "major_version": "8",
+      "version": "8.0",
+      "long_version": "8.0.3",
+      "variant": "ubuntu2404",
+      "parent": "ubuntu",
+      "is_parent": "True",
+      "is_latest": "False",
+      "platforms": "linux/amd64,linux/arm64",
+      "platform": "linux/amd64",
+      "arch": "amd64",
+      "runner": "ubuntu-latest"
+    },
+    {
+      "major_version": "8",
+      "version": "8.0",
+      "long_version": "8.0.3",
+      "variant": "ubuntu2404",
+      "parent": "ubuntu",
+      "is_parent": "True",
+      "is_latest": "False",
+      "platforms": "linux/amd64,linux/arm64",
+      "platform": "linux/arm64",
+      "arch": "arm64",
+      "runner": "ubuntu-24.04-arm"
+    },
+    {
+      "major_version": "8",
+      "version": "8.0",
+      "long_version": "8.0.3",
+      "variant": "ubuntu2404-edge",
+      "parent": "ubuntu-edge",
+      "is_parent": "True",
+      "is_latest": "False",
+      "platforms": "linux/amd64,linux/arm64",
+      "platform": "linux/amd64",
+      "arch": "amd64",
+      "runner": "ubuntu-latest"
+    },
+    {
+      "major_version": "8",
+      "version": "8.0",
+      "long_version": "8.0.3",
+      "variant": "ubuntu2404-edge",
+      "parent": "ubuntu-edge",
+      "is_parent": "True",
+      "is_latest": "False",
+      "platforms": "linux/amd64,linux/arm64",
+      "platform": "linux/arm64",
+      "arch": "arm64",
+      "runner": "ubuntu-24.04-arm"
+    },
+    {
+      "major_version": "8",
+      "version": "8.0",
+      "long_version": "8.0.3",
+      "variant": "alpine320",
+      "parent": "alpine",
+      "is_parent": "True",
+      "is_latest": "False",
+      "platforms": "linux/amd64,linux/arm64",
+      "platform": "linux/amd64",
+      "arch": "amd64",
+      "runner": "ubuntu-latest"
+    },
+    {
+      "major_version": "8",
+      "version": "8.0",
+      "long_version": "8.0.3",
+      "variant": "alpine320",
+      "parent": "alpine",
+      "is_parent": "True",
+      "is_latest": "False",
+      "platforms": "linux/amd64,linux/arm64",
+      "platform": "linux/arm64",
+      "arch": "arm64",
+      "runner": "ubuntu-24.04-arm"
+    },
+    {
+      "major_version": "8",
+      "version": "8.0",
+      "long_version": "8.0.3",
+      "variant": "scratch320",
+      "parent": "scratch",
+      "is_parent": "True",
+      "is_latest": "False",
+      "platforms": "linux/amd64,linux/arm64",
+      "platform": "linux/amd64",
+      "arch": "amd64",
+      "runner": "ubuntu-latest"
+    },
+    {
+      "major_version": "8",
+      "version": "8.0",
+      "long_version": "8.0.3",
+      "variant": "scratch320",
+      "parent": "scratch",
+      "is_parent": "True",
+      "is_latest": "False",
+      "platforms": "linux/amd64,linux/arm64",
+      "platform": "linux/arm64",
+      "arch": "arm64",
+      "runner": "ubuntu-24.04-arm"
+    },
+    {
+      "major_version": "8",
+      "version": "8.0",
+      "long_version": "8.0.3",
+      "variant": "vaapi2404",
+      "parent": "vaapi",
+      "is_parent": "True",
+      "is_latest": "False",
+      "platforms": "linux/amd64",
+      "platform": "linux/amd64",
+      "arch": "amd64",
+      "runner": "ubuntu-latest"
+    },
+    {
+      "major_version": "8",
+      "version": "8.0",
+      "long_version": "8.0.3",
+      "variant": "nvidia2404",
+      "parent": "nvidia",
+      "is_parent": "True",
+      "is_latest": "False",
+      "platforms": "linux/amd64",
+      "platform": "linux/amd64",
+      "arch": "amd64",
+      "runner": "ubuntu-latest"
+    },
+    {
+      "major_version": "8",
       "version": "8.1",
       "long_version": "8.1.2",
       "variant": "ubuntu2404",
@@ -131,9 +261,9 @@
       "runner": "ubuntu-latest"
     },
     {
-      "major_version": "8",
-      "version": "8.0",
-      "long_version": "8.0.3",
+      "major_version": "9",
+      "version": "9.0",
+      "long_version": "9.0.1",
       "variant": "ubuntu2404",
       "parent": "ubuntu",
       "is_parent": "True",
@@ -144,9 +274,9 @@
       "runner": "ubuntu-latest"
     },
     {
-      "major_version": "8",
-      "version": "8.0",
-      "long_version": "8.0.3",
+      "major_version": "9",
+      "version": "9.0",
+      "long_version": "9.0.1",
       "variant": "ubuntu2404",
       "parent": "ubuntu",
       "is_parent": "True",
@@ -157,9 +287,9 @@
       "runner": "ubuntu-24.04-arm"
     },
     {
-      "major_version": "8",
-      "version": "8.0",
-      "long_version": "8.0.3",
+      "major_version": "9",
+      "version": "9.0",
+      "long_version": "9.0.1",
       "variant": "ubuntu2404-edge",
       "parent": "ubuntu-edge",
       "is_parent": "True",
@@ -170,9 +300,9 @@
       "runner": "ubuntu-latest"
     },
     {
-      "major_version": "8",
-      "version": "8.0",
-      "long_version": "8.0.3",
+      "major_version": "9",
+      "version": "9.0",
+      "long_version": "9.0.1",
       "variant": "ubuntu2404-edge",
       "parent": "ubuntu-edge",
       "is_parent": "True",
@@ -183,9 +313,9 @@
       "runner": "ubuntu-24.04-arm"
     },
     {
-      "major_version": "8",
-      "version": "8.0",
-      "long_version": "8.0.3",
+      "major_version": "9",
+      "version": "9.0",
+      "long_version": "9.0.1",
       "variant": "alpine320",
       "parent": "alpine",
       "is_parent": "True",
@@ -196,9 +326,9 @@
       "runner": "ubuntu-latest"
     },
     {
-      "major_version": "8",
-      "version": "8.0",
-      "long_version": "8.0.3",
+      "major_version": "9",
+      "version": "9.0",
+      "long_version": "9.0.1",
       "variant": "alpine320",
       "parent": "alpine",
       "is_parent": "True",
@@ -209,9 +339,9 @@
       "runner": "ubuntu-24.04-arm"
     },
     {
-      "major_version": "8",
-      "version": "8.0",
-      "long_version": "8.0.3",
+      "major_version": "9",
+      "version": "9.0",
+      "long_version": "9.0.1",
       "variant": "scratch320",
       "parent": "scratch",
       "is_parent": "True",
@@ -222,9 +352,9 @@
       "runner": "ubuntu-latest"
     },
     {
-      "major_version": "8",
-      "version": "8.0",
-      "long_version": "8.0.3",
+      "major_version": "9",
+      "version": "9.0",
+      "long_version": "9.0.1",
       "variant": "scratch320",
       "parent": "scratch",
       "is_parent": "True",
@@ -235,9 +365,9 @@
       "runner": "ubuntu-24.04-arm"
     },
     {
-      "major_version": "8",
-      "version": "8.0",
-      "long_version": "8.0.3",
+      "major_version": "9",
+      "version": "9.0",
+      "long_version": "9.0.1",
       "variant": "vaapi2404",
       "parent": "vaapi",
       "is_parent": "True",
@@ -248,9 +378,9 @@
       "runner": "ubuntu-latest"
     },
     {
-      "major_version": "8",
-      "version": "8.0",
-      "long_version": "8.0.3",
+      "major_version": "9",
+      "version": "9.0",
+      "long_version": "9.0.1",
       "variant": "nvidia2404",
       "parent": "nvidia",
       "is_parent": "True",
@@ -264,6 +394,66 @@
   "manifest": [
     {
       "major_version": "8",
+      "version": "8.0",
+      "long_version": "8.0.3",
+      "variant": "ubuntu2404",
+      "parent": "ubuntu",
+      "is_parent": "True",
+      "is_latest": "False",
+      "platforms": "linux/amd64,linux/arm64"
+    },
+    {
+      "major_version": "8",
+      "version": "8.0",
+      "long_version": "8.0.3",
+      "variant": "ubuntu2404-edge",
+      "parent": "ubuntu-edge",
+      "is_parent": "True",
+      "is_latest": "False",
+      "platforms": "linux/amd64,linux/arm64"
+    },
+    {
+      "major_version": "8",
+      "version": "8.0",
+      "long_version": "8.0.3",
+      "variant": "alpine320",
+      "parent": "alpine",
+      "is_parent": "True",
+      "is_latest": "False",
+      "platforms": "linux/amd64,linux/arm64"
+    },
+    {
+      "major_version": "8",
+      "version": "8.0",
+      "long_version": "8.0.3",
+      "variant": "scratch320",
+      "parent": "scratch",
+      "is_parent": "True",
+      "is_latest": "False",
+      "platforms": "linux/amd64,linux/arm64"
+    },
+    {
+      "major_version": "8",
+      "version": "8.0",
+      "long_version": "8.0.3",
+      "variant": "vaapi2404",
+      "parent": "vaapi",
+      "is_parent": "True",
+      "is_latest": "False",
+      "platforms": "linux/amd64"
+    },
+    {
+      "major_version": "8",
+      "version": "8.0",
+      "long_version": "8.0.3",
+      "variant": "nvidia2404",
+      "parent": "nvidia",
+      "is_parent": "True",
+      "is_latest": "False",
+      "platforms": "linux/amd64"
+    },
+    {
+      "major_version": "8",
       "version": "8.1",
       "long_version": "8.1.2",
       "variant": "ubuntu2404",
@@ -323,9 +513,9 @@
       "platforms": "linux/amd64"
     },
     {
-      "major_version": "8",
-      "version": "8.0",
-      "long_version": "8.0.3",
+      "major_version": "9",
+      "version": "9.0",
+      "long_version": "9.0.1",
       "variant": "ubuntu2404",
       "parent": "ubuntu",
       "is_parent": "True",
@@ -333,9 +523,9 @@
       "platforms": "linux/amd64,linux/arm64"
     },
     {
-      "major_version": "8",
-      "version": "8.0",
-      "long_version": "8.0.3",
+      "major_version": "9",
+      "version": "9.0",
+      "long_version": "9.0.1",
       "variant": "ubuntu2404-edge",
       "parent": "ubuntu-edge",
       "is_parent": "True",
@@ -343,9 +533,9 @@
       "platforms": "linux/amd64,linux/arm64"
     },
     {
-      "major_version": "8",
-      "version": "8.0",
-      "long_version": "8.0.3",
+      "major_version": "9",
+      "version": "9.0",
+      "long_version": "9.0.1",
       "variant": "alpine320",
       "parent": "alpine",
       "is_parent": "True",
@@ -353,9 +543,9 @@
       "platforms": "linux/amd64,linux/arm64"
     },
     {
-      "major_version": "8",
-      "version": "8.0",
-      "long_version": "8.0.3",
+      "major_version": "9",
+      "version": "9.0",
+      "long_version": "9.0.1",
       "variant": "scratch320",
       "parent": "scratch",
       "is_parent": "True",
@@ -363,9 +553,9 @@
       "platforms": "linux/amd64,linux/arm64"
     },
     {
-      "major_version": "8",
-      "version": "8.0",
-      "long_version": "8.0.3",
+      "major_version": "9",
+      "version": "9.0",
+      "long_version": "9.0.1",
       "variant": "vaapi2404",
       "parent": "vaapi",
       "is_parent": "True",
@@ -373,9 +563,9 @@
       "platforms": "linux/amd64"
     },
     {
-      "major_version": "8",
-      "version": "8.0",
-      "long_version": "8.0.3",
+      "major_version": "9",
+      "version": "9.0",
+      "long_version": "9.0.1",
       "variant": "nvidia2404",
       "parent": "nvidia",
       "is_parent": "True",
